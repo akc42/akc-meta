@@ -1,0 +1,102 @@
+<!--
+@license
+    Copyright (c) 2015 Alan Chandler, all rights reserved
+
+    This file is part of akc-meta.
+
+    akc-meta is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    akc-meta is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with akc-meta.  If not, see <http://www.gnu.org/licenses/>.
+-->
+
+<link rel="import" href="../polymer/polymer.html">
+
+
+
+<script>
+/*
+* An element for sharing data across the dom tree.  Modelled on what I thought <iron-meta> was
+* supposed to do, but I suspect doesn't
+*
+*  Example:
+*
+*      <akc-meta key="abc" value="{{twowaybindablevalue}}"></akc-meta>
+*
+*  @group Alan Chandler's Elements
+*  @element akc-meta
+*  @demo demo/index.html
+*  @hero hero.svg
+*/
+(function(){
+
+var elements = [];
+
+var values = [];
+
+  Polymer({
+
+    is: 'akc-meta',
+
+    properties: {
+
+      /**
+       * `key` is a string to identify the
+       *
+       */
+      key: String,
+
+      /**
+       * This is a value that will be replicated to all elements.
+       * @type some valid value
+       */
+      value: {
+        type: Object,
+        notify:true,
+        observer:'_valueChanged',
+        value:{}
+      },
+
+    },
+
+    attached: function() {
+      elements.push({el:this,key:this.key}); //add this element to the list of elements
+    },
+
+    detached: function() {
+      elements.splice(elements.indexOf(this),1); //rempve this element
+    },
+    /**
+     * This routine is called by the first routine to detect a change.
+     *
+     * @param {} value The new value .
+     */
+    _externalChange:function(value) {
+      this.value = Object.clone(value);
+    },
+    /**
+     * This routine is called by the first routine to detect a change.
+     *
+     * @param {} value The new value .
+     */
+    _valueChanged: function() {
+      elements.each(function(item){
+        if(item.el !== this && item.key == this.key) {
+          item.el._externalChange(this.value);
+        }
+      });
+
+    }
+
+  });
+}());
+
+</script>

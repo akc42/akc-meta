@@ -1,0 +1,65 @@
+<!--
+    Copyright (c) 2015 Alan Chandler, all rights reserved
+
+    This file is part of akc-meta.
+
+    akc-meta is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    akc-meta is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with akc-meta.  If not, see <http://www.gnu.org/licenses/>.
+->
+
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+
+    <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+    <script src="../../web-component-tester/browser.js"></script>
+
+    <!-- Step 1: import the element to test -->
+    <link rel="import" href="../akc-meta.html">
+  </head>
+  <body>
+
+    <!-- You can use the document as a place to set up your fixtures. -->
+    <akc-meta></akc-meta>
+
+    <script>
+      var myEl = document.querySelector('akc-meta');
+
+      suite('<akc-meta>', function() {
+
+        test('defines the "author" property', function() {
+          assert.equal(myEl.author.name, 'Dimitri Glazkov');
+          assert.equal(myEl.author.image, 'http://addyosmani.com/blog/wp-content/uploads/2013/04/unicorn.jpg');
+        });
+
+        test('says hello', function() {
+          assert.equal(myEl.sayHello(), 'akc-meta says, Hello World!');
+
+          var greetings = myEl.sayHello('greetings Earthlings');
+          assert.equal(greetings, 'akc-meta says, greetings Earthlings');
+        });
+
+        test('fires lasers', function(done) {
+          myEl.addEventListener('akc-meta-lasers', function(event) {
+            assert.equal(event.detail.sound, 'Pew pew!');
+            done();
+          });
+          myEl.fireLasers();
+        });
+
+      });
+    </script>
+
+  </body>
+</html>

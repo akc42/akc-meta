@@ -1,0 +1,27 @@
+{
+  "name": "akc-meta",
+  "version": "1.0.3",
+  "authors": [
+    "Alan Chandler <alan@chandlerfamily.org.uk>"
+  ],
+  "description": "An experiment in creating an element that keeps copies",
+  "keywords": [
+    "web-component",
+    "polymer",
+    "seed"
+  ],
+  "main": "akc-meta.html",
+  "license": "http://akc42.github.io/LICENSE.txt",
+  "homepage": "https://github.com/akc42/akc-meta/",
+  "ignore": [
+    "/.*",
+    "/test/"
+  ],
+  "dependencies": {
+    "polymer": "Polymer/polymer#^1.1.0"
+  },
+  "devDependencies": {
+    "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",
+    "web-component-tester": "*"
+  }
+}
