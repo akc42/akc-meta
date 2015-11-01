@@ -58,6 +58,7 @@ var values = {};
         type:String,
         observer:'_keyChanged',
         value:'default'
+      },
 
       /**
        * This is a value that will be replicated to all elements.
@@ -68,37 +69,46 @@ var values = {};
         type: Object,
         observer:'_valueChanged',
         value:{}
-      },
+      }
 
     },
     attached:function() {
       this._valueChanged(this.value);
-    }
+    },
     detached:function() {
       this._unregister(this.key);
     },
     /**
-     * This routine is called  when the value changes and 
+     * This routine is called  when the value changes and
      *
      * @param {} value The new value .
      */
     _valueChanged: function(value) {
-      var self = this;
+      if(typeof value === 'undefined') {
+        value={};
+      }
       values[this.key] = value
-      queries[this.key].each(function(item){
-        item._setValue(values[self.key]);  //set the value of every item referenced
-      });
+      if (this.key in queries) {
+        var index, len;
+        for(index = 0, len = queries[this.key].length; index < len; ++index) {
+          queries[this.key][index].friendSetter(values[this.key]);  //set the value of every item referenced
+
+        }
+      }
     },
-    _keyChanged:function(oldKey,newKey) {
+    _keyChanged:function(newKey,oldKey) {
       this._unregister(oldKey);
       this._valueChanged(this.value);  //This just informs all the others
     },
     _unregister:function(key) {
       var foundElement = false;
-      queries[key].each(function(item){
-        foundElement = true;
-        item._setValue({});  //set the value of every item referenced
-      });
+      if (key in queries) {
+        var index,len;
+        for(index = 0, len = queries[key].length; index < len;++index) {
+          queries[key][index].friendSetter({});
+          foundElement = true;
+        }
+      }
       if(foundElement) {
         values[key] = {};
       } else {
@@ -132,16 +142,16 @@ var values = {};
 
     },
     _keyChanged:function(newKey,oldKey) {
-      this._unregisterElement(oldKey); 
+      this._unregisterElement(oldKey);
       this._registerElement(newKey);
     },
     _registerElement:function(key) {
-       if(!(key in queries){
+       if(!(key in queries)){
         queries[key] = [];
       }
-      queries[key].push(this); //add this element to the query list  
-      this._setValue((key in values)?values[key]:{});  
-    }.
+      queries[key].push(this); //add this element to the query list
+      this._setValue((key in values)?values[key]:{});
+    },
     _unregisterElement:function(key) {
       if (key in queries) {
         if(queries[key].indexOf(this) > -1) {
@@ -149,6 +159,9 @@ var values = {};
 
         }
       }
+    },
+    friendSetter:function(value) {
+      this._setValue(value);
     }
   });
 

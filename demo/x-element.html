@@ -8,8 +8,11 @@
         display: block;
       }
     </style>
+    <!-- query meta for external data -->
     <akc-meta-query key="demo2" value="{{text}}"></akc-meta-query>
     <div>[[text]]</div>
+    <!-- send the value back out as a new meta -->
+    <akc-meta key="demo3" value="[[text]]"></akc-meta>
   </template>
   <script>
     Polymer({

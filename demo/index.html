@@ -45,16 +45,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   <!-- This is a unchanged value -->
 
   <akc-meta key="demo1" value="A Demo string"></akc-meta>
-  <paper-card heading="Demo1 Value" >
+  <paper-card heading="Static Value Passing" >
     <div class="card-content">
       <akc-meta-query key="demo1" value="{{demovalue}}"></akc-meta-query>
       <span>[[demovalue]]</span>
     </div>
     <div class="card-actions">
-      
+
     </div>
   </paper-card>
-  <paper-card heading="Card title" image="" elevation="1" animated-shadow="false">
+  <paper-card heading="Dynamic Value Passing" image="" elevation="1" animated-shadow="false">
     <div class="card-content">
       <akc-meta-query key="demo2" value="{{avalue}}"></akc-meta-query>
       <span>[[avalue]]</span>
@@ -64,7 +64,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <paper-input label="Value for demo 2" value="{{demo2value}}"></paper-input>
     </div>
   </paper-card>
-  <x-element></x-element>
+
+  <paper-card heading="Passing Values in and out of Elements" image="" elevation="1" animated-shadow="false">
+    <akc-meta-query key="demo3" value="{{demo3Value}}"></akc-meta-query>
+    <div class="card-content">[[demo3Value]]</div>
+    <div class="card-actions">
+      <x-element></x-element>
+    </div>
+  </paper-card>
   </template>
   </body>
 </html>
