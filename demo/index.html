@@ -8,41 +8,63 @@ The complete set of contributors may be found at http://polymer.github.io/CONTRI
 Code distributed by Google as part of the polymer project is also
 subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
 -->
+<!--
+@license
+    Copyright (c) 2015 Alan Chandler, all rights reserved
+
+    This file is part of akc-meta.
+
+    akc-meta is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    akc-meta is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with akc-meta.  If not, see <http://www.gnu.org/licenses/>.
+-->
+
+
 <html>
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
     <title>akc-meta Demo</title>
     <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+    <link rel="import" href="../../paper-card/paper-card.html">
+    <link rel="import" href="../../paper-input/paper-input.html">
     <link rel="import" href="../akc-meta.html">
+    <link rel="import" href="x-element.html">
   </head>
   <body unresolved>
+  <template is="dom-bind">
+  <!-- This is a unchanged value -->
 
-    <p>An example of <code>&lt;akc-meta&gt;</code>:</p>
-
-    <p>Make words! <button id="saybtn">Say Something</button></p>
-    <p>Make lasers! <button id="laserbtn">Fire lasers</button></p>
-
-    <akc-meta author='{"name": "Lord Meowser", "image": "http://placekitten.com/g/200/300"}' fancy>
-      <h2>Hello akc-meta</h2>
-    </akc-meta>
-
-    <script>
-      var seedElement = document.querySelector('akc-meta');
+  <akc-meta key="demo1" value="A Demo string"></akc-meta>
+  <paper-card heading="Demo1 Value" >
+    <div class="card-content">
+      <akc-meta-query key="demo1" value="{{demovalue}}"></akc-meta-query>
+      <span>[[demovalue]]</span>
+    </div>
+    <div class="card-actions">
       
-      document.querySelector('#saybtn').addEventListener('click', function() {
-        alert(seedElement.sayHello('Hallo!'));
-      });
-      
-      document.querySelector('#laserbtn').addEventListener('click', function() {
-        seedElement.fireLasers();
-      });
-      
-      document.addEventListener("akc-meta-lasers", function(e) {
-        console.log(e.detail.sound);
-      });
-      
-    </script>
-
+    </div>
+  </paper-card>
+  <paper-card heading="Card title" image="" elevation="1" animated-shadow="false">
+    <div class="card-content">
+      <akc-meta-query key="demo2" value="{{avalue}}"></akc-meta-query>
+      <span>[[avalue]]</span>
+    </div>
+    <div class="card-actions">
+      <akc-meta key="demo2" value="[[demo2value]]"></akc-meta>
+      <paper-input label="Value for demo 2" value="{{demo2value}}"></paper-input>
+    </div>
+  </paper-card>
+  <x-element></x-element>
+  </template>
   </body>
 </html>

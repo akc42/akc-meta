@@ -24,12 +24,14 @@
 
 <script>
 /*
-* An element for sharing data across the dom tree.  Modelled on what I thought <iron-meta> was
-* supposed to do, but I suspect doesn't
+* An pair of element for sharing data across the dom tree.  Modelled on what I thought <iron-meta> was and doesn't seem to be
+* In particular, any value changes on the publisher of the element will be notified to all queries with the same key
+*
 *
 *  Example:
 *
-*      <akc-meta key="abc" value="{{twowaybindablevalue}}"></akc-meta>
+*      <akc-meta key="abc" value="[[inputvalue]]"></akc-meta>
+*     <akc-meta-query key="abc" value="{{outputvalue}}"></akc-meta-query>
 *
 *  @group Alan Chandler's Elements
 *  @element akc-meta
@@ -38,9 +40,9 @@
 */
 (function(){
 
-var elements = [];
+var queries = {};
 
-var values = [];
+var values = {};
 
   Polymer({
 
@@ -49,54 +51,107 @@ var values = [];
     properties: {
 
       /**
-       * `key` is a string to identify the
+       * `key` is a string to identify the data that is being stored and replicated
        *
        */
-      key: String,
+      key: {
+        type:String,
+        observer:'_keyChanged',
+        value:'default'
 
       /**
        * This is a value that will be replicated to all elements.
-       * @type some valid value
+       * @type Object
+       *
        */
       value: {
         type: Object,
-        notify:true,
         observer:'_valueChanged',
         value:{}
       },
 
     },
+    attached:function() {
+      this._valueChanged(this.value);
+    }
+    detached:function() {
+      this._unregister(this.key);
+    },
+    /**
+     * This routine is called  when the value changes and 
+     *
+     * @param {} value The new value .
+     */
+    _valueChanged: function(value) {
+      var self = this;
+      values[this.key] = value
+      queries[this.key].each(function(item){
+        item._setValue(values[self.key]);  //set the value of every item referenced
+      });
+    },
+    _keyChanged:function(oldKey,newKey) {
+      this._unregister(oldKey);
+      this._valueChanged(this.value);  //This just informs all the others
+    },
+    _unregister:function(key) {
+      var foundElement = false;
+      queries[key].each(function(item){
+        foundElement = true;
+        item._setValue({});  //set the value of every item referenced
+      });
+      if(foundElement) {
+        values[key] = {};
+      } else {
+        delete values[key];
+      }
 
+    }
+  });
+  Polymer({
+    is: 'akc-meta-query',
+
+    properties: {
+      key: {
+        type:String,
+        observer:'_keyChanged',
+        value:'default'
+      },
+      value: {
+        type:Object,
+        notify:true,
+        readOnly:true,
+        value:{}
+      }
+    },
     attached: function() {
-      elements.push({el:this,key:this.key}); //add this element to the list of elements
+      this._registerElement(this.key);
     },
 
     detached: function() {
-      elements.splice(elements.indexOf(this),1); //rempve this element
+      this._unregisterElement(this.key);
+
     },
-    /**
-     * This routine is called by the first routine to detect a change.
-     *
-     * @param {} value The new value .
-     */
-    _externalChange:function(value) {
-      this.value = Object.clone(value);
+    _keyChanged:function(newKey,oldKey) {
+      this._unregisterElement(oldKey); 
+      this._registerElement(newKey);
     },
-    /**
-     * This routine is called by the first routine to detect a change.
-     *
-     * @param {} value The new value .
-     */
-    _valueChanged: function() {
-      elements.each(function(item){
-        if(item.el !== this && item.key == this.key) {
-          item.el._externalChange(this.value);
+    _registerElement:function(key) {
+       if(!(key in queries){
+        queries[key] = [];
+      }
+      queries[key].push(this); //add this element to the query list  
+      this._setValue((key in values)?values[key]:{});  
+    }.
+    _unregisterElement:function(key) {
+      if (key in queries) {
+        if(queries[key].indexOf(this) > -1) {
+          queries[key].splice(queries[key].indexOf(this),1);  //remove self from query list
+
         }
-      });
-
+      }
     }
-
   });
+
 }());
 
 </script>
