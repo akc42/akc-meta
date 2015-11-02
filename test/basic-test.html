@@ -71,7 +71,7 @@
           });
           it('akc-meta-query will reflect akc-meta object value with same key',function(){
             app.value1 = {path:'/',name:'home', selected:true};
-            expect(subscriber.value).to.equal(publisher.value);
+            expect(subscriber.value).to.deep.equal(publisher.value);
           });
           it('reflects values as strings',function(){
             app.value1='This is a string';
@@ -133,6 +133,25 @@
             app.key2 = 'keyc';
             expect(app.value2).to.equal('stringc');
           });
+        });
+        describe('value objects dont interfere with each other',function(){
+          beforeEach(function(){
+            app.key1 = 'keya';
+            app.key2 = 'keya';
+            app.key3 = 'keya';
+            app.value1 = {hash1:'value1',hash2:'value2'};
+          });
+          it('alter object component value of publisher doesnt change original',function(){
+            var publisher = document.getElementById('meta1');
+            assert.deepEqual(publisher.value,{hash1:'value1',hash2:'value2'});
+            publisher.value.hash3 = 'value3';
+            expect(publisher.value).to.not.deep.equal({hash1:'value1',hash2:'value2'});
+          });
+          it('cannot alter original values of object from query',function(){
+            app.value3.hash1 = 'A new Value';
+            expect(app.value1.hash1).to.equal('value1');
+          });
+
         });
 
       });

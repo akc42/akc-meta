@@ -91,11 +91,11 @@ var values = {};
       if(typeof value === 'undefined') {
         value={};
       }
-      values[this.key] = value
+      values[this.key] = JSON.parse(JSON.stringify(value));
       if (this.key in queries) {
         var index, len;
         for(index = 0, len = queries[this.key].length; index < len; ++index) {
-          queries[this.key][index].friendSetter(values[this.key]);  //set the value of every item referenced
+          queries[this.key][index]._setValue(values[this.key]);  //set the value of every item referenced
 
         }
       }
@@ -109,7 +109,7 @@ var values = {};
       if (key in queries) {
         var index,len;
         for(index = 0, len = queries[key].length; index < len;++index) {
-          queries[key][index].friendSetter({});
+          queries[key][index]._setValue({});
           foundElement = true;
         }
       }
@@ -169,7 +169,7 @@ var values = {};
         queries[key] = [];
       }
       queries[key].push(this); //add this element to the query list
-      this._setValue((key in values)?values[key]:{});
+      this._setValue((key in values)?JSON.parse(JSON.stringify(values[key])):{});
     },
     _unregisterElement:function(key) {
       if (key in queries) {
@@ -178,9 +178,6 @@ var values = {};
 
         }
       }
-    },
-    friendSetter:function(value) {
-      this._setValue(value);
     }
   });
 
