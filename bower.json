@@ -4,14 +4,14 @@
   "authors": [
     "Alan Chandler <alan@chandlerfamily.org.uk>"
   ],
-  "description": "An experiment in creating an element that keeps copies",
+  "description": "An experiment for a better iron-meta",
   "keywords": [
     "web-component",
     "polymer",
-    "seed"
+    "iron-meta"
   ],
   "main": "akc-meta.html",
-  "license": "http://akc42.github.io/LICENSE.txt",
+  "license": "http://akc42.github.io/LICENSE.md",
   "homepage": "https://github.com/akc42/akc-meta/",
   "ignore": [
     "/.*",
@@ -24,6 +24,7 @@
     "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",
     "web-component-tester": "*",
     "paper-card": "PolymerElements/paper-card#~1.0.7",
-    "paper-input": "PolymerElements/paper-input#~1.0.18"
+    "paper-input": "PolymerElements/paper-input#~1.0.18",
+    "test-fixture": "PolymerElements/test-fixture#~1.0.0"
   }
 }

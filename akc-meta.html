@@ -1,21 +1,24 @@
 <!--
-@license
-    Copyright (c) 2015 Alan Chandler, all rights reserved
+@licence MIT
+Copyright (c) 2015 Alan Chandler
 
-    This file is part of akc-meta.
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
 
-    akc-meta is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
 
-    akc-meta is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with akc-meta.  If not, see <http://www.gnu.org/licenses/>.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
 -->
 
 <link rel="import" href="../polymer/polymer.html">
@@ -23,9 +26,12 @@
 
 
 <script>
-/*
-* An pair of element for sharing data across the dom tree.  Modelled on what I thought <iron-meta> was and doesn't seem to be
-* In particular, any value changes on the publisher of the element will be notified to all queries with the same key
+/**
+* A pair of element for sharing data across the dom tree based on the use of a key.
+*
+* The element <akc-meta> is for publishing the value whereas <akc-meta-query> is an element
+* to query the published value and retrieve it. The pair have been designed to use databinding
+*
 *
 *
 *  Example:
@@ -36,7 +42,6 @@
 *  @group Alan Chandler's Elements
 *  @element akc-meta
 *  @demo demo/index.html
-*  @hero hero.svg
 */
 (function(){
 
@@ -45,14 +50,17 @@ var queries = {};
 var values = {};
 
   Polymer({
-
+    /**
+    * <akc-meta> is an element for publishing data into the global repository
+    */
     is: 'akc-meta',
 
     properties: {
 
       /**
        * `key` is a string to identify the data that is being stored and replicated
-       *
+       * @attribute key
+       * @type string
        */
       key: {
         type:String,
@@ -62,7 +70,8 @@ var values = {};
 
       /**
        * This is a value that will be replicated to all elements.
-       * @type Object
+       * @attribute @value
+       * @type Any
        *
        */
       value: {
@@ -78,11 +87,6 @@ var values = {};
     detached:function() {
       this._unregister(this.key);
     },
-    /**
-     * This routine is called  when the value changes and
-     *
-     * @param {} value The new value .
-     */
     _valueChanged: function(value) {
       if(typeof value === 'undefined') {
         value={};
@@ -118,14 +122,29 @@ var values = {};
     }
   });
   Polymer({
+    /**
+    * <akc-meta-query> is an element to query the data in the global repository
+    */
     is: 'akc-meta-query',
 
     properties: {
+      /**
+      * key is key to the global repository to say which data you wish to extract
+      *
+      * @attribute key
+      * @type String
+      */
       key: {
         type:String,
         observer:'_keyChanged',
         value:'default'
       },
+      /**
+      * value is a value that is read out of the repository
+      *
+      * @attribute value
+      * @type any
+      */
       value: {
         type:Object,
         notify:true,

@@ -15,7 +15,7 @@
 
     You should have received a copy of the GNU General Public License
     along with akc-meta.  If not, see <http://www.gnu.org/licenses/>.
-->
+-->
 
 <html>
   <head>
@@ -24,6 +24,9 @@
 
     <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
     <script src="../../web-component-tester/browser.js"></script>
+    <script src="../../test-fixture/test-fixture-mocha.js"></script>
+
+    <link rel="import" href="../../test-fixture/test-fixture.html">
 
     <!-- Step 1: import the element to test -->
     <link rel="import" href="../akc-meta.html">
@@ -31,31 +34,105 @@
   <body>
 
     <!-- You can use the document as a place to set up your fixtures. -->
-    <akc-meta></akc-meta>
+
+    <test-fixture id="basic-test">
+    <template>
+      <template is="dom-bind" id=app>
+        <akc-meta key="[[key1]]" value="{{value1}}" id="meta1"></akc-meta>
+        <akc-meta-query key="[[key2]]" value="{{value2}}" id="meta2"></akc-meta-query>
+        <akc-meta-query key="[[key3]]" value="{{value3}}" id="meta3"></akc-meta-query>
+        <akc-meta key="[[key4]]" value="{{value4}}" id="meta4"></akc-meta>
+      </template>
+    </template>
+    </test-fixture>
 
     <script>
-      var myEl = document.querySelector('akc-meta');
 
-      suite('<akc-meta>', function() {
+      describe('<akc-meta>', function() {
+        var template,app;
+         beforeEach(function(){
+          template = fixture('basic-test');
+          app = document.getElementById('app');
+         });
+         it ('akc-meta creates a valid element', function(){
+          expect(document.getElementById('meta1')).to.be.ok;
+         });
+         it('akc-meta-query creates a valid element',function(){
+          expect(document.getElementById('meta2')).to.be.ok;
+         });
+         describe('akc-meta and akc-meta-query pairs', function(){
+          var publisher, subscriber;
+          beforeEach(function(){
+              app.key1 = 'keya';
+              app.key2 = 'keya';
 
-        test('defines the "author" property', function() {
-          assert.equal(myEl.author.name, 'Dimitri Glazkov');
-          assert.equal(myEl.author.image, 'http://addyosmani.com/blog/wp-content/uploads/2013/04/unicorn.jpg');
-        });
-
-        test('says hello', function() {
-          assert.equal(myEl.sayHello(), 'akc-meta says, Hello World!');
-
-          var greetings = myEl.sayHello('greetings Earthlings');
-          assert.equal(greetings, 'akc-meta says, greetings Earthlings');
-        });
-
-        test('fires lasers', function(done) {
-          myEl.addEventListener('akc-meta-lasers', function(event) {
-            assert.equal(event.detail.sound, 'Pew pew!');
-            done();
+              publisher = document.getElementById('meta1');
+              subscriber =  document.getElementById('meta2');
           });
-          myEl.fireLasers();
+          it('akc-meta-query will reflect akc-meta object value with same key',function(){
+            app.value1 = {path:'/',name:'home', selected:true};
+            expect(subscriber.value).to.equal(publisher.value);
+          });
+          it('reflects values as strings',function(){
+            app.value1='This is a string';
+            expect(app.value2).to.eql('This is a string');
+          });
+          it('reflects values as an array',function(){
+            app.value1= ['first','second','third'];
+            expect(app.value2).to.eql(['first','second','third']);
+          });
+          it('doesnt reflect to a query with a different key',function(){
+            app.value1 = {path:'/',name:'home', selected:true};
+            app.key3 = 'keyb';
+            expect(app.value3).to.not.eql({path:'/',name:'home', selected:true});
+          });
+          it('multple queries will all receive value changes',function(){
+            app.key3 = 'keya';
+            app.value1 = 'This is a multiple query test';
+            expect(app.value2).to.equal('This is a multiple query test');
+            expect(app.value3).to.equal('This is a multiple query test');
+            app.value1 = 'New Value';
+            expect(app.value2).to.equal('New Value');
+            expect(app.value3).to.equal('New Value');
+
+          });
+          it('changing the value on a query does not propergate to others',function(){
+            app.key3 = 'keya';
+            app.value1 = "write only test";
+            app.value3 = "read only value";
+            expect(app.value2).to.equal('write only test');
+          });
+;       });
+        describe('handles key changes',function(){
+          beforeEach(function(){
+            app.key1 = 'keya';
+            app.key2 = 'keya';
+            app.key3 = 'keyb';
+            app.key4 = 'keyc';
+            app.value1 = 'stringa'
+            app.value4 = 'stringc'
+          });
+          it('key of publisher change, query value becomes {}',function(){
+            assert.equal(app.value2,'stringa');
+            app.key1 = 'keyd';
+            expect(app.value2).to.deep.equal({});
+          });
+          it('akc-meta changes key to one of existing query',function(){
+            assert.deepEqual(app.value3,{});
+            app.key1 = 'keyb';
+            expect(app.value3).to.equal('stringa');
+          });
+          it('akc-meta changes to existing key, it overwrites the value',function(){
+            app.key3 = 'keyc';
+            expect(app.value3).to.equal('stringc');
+            app.key1 = 'keyc';
+            expect(app.value3).to.equal('stringa');
+          });
+          it('akc-meta-query changes to existing key, then it gets the new value',function(){
+            assert.equal(app.value2,'stringa');
+            app.key2 = 'keyc';
+            expect(app.value2).to.equal('stringc');
+          });
         });
 
       });
