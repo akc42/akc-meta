@@ -2,7 +2,7 @@
 
 ## Introduction
 
-**akc-meta** and **akc-meta-query** are a pair of Polymer webcomponents that enable across DOM communication.  **akc-meta** is use to inject a *value* (value is a property of the elements) into global storage, whilst one or more **akc-meta-query** elements are used to read the value out again.
+**akc-meta** and **akc-meta-query** are a pair of Polymer webcomponents that enable across DOM communication.  **akc-meta** is used to inject a *value* (value is a property of the elements) into global storage, whilst one or more **akc-meta-query** elements are used to read the value out again.
 
 Values in global storage are accessed via  a *key* (again an element property) provided to the elements as strings. Values can be of any type including Object. 
 
