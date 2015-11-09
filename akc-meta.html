@@ -45,6 +45,36 @@ SOFTWARE.
 */
 (function(){
 
+function clone(objectToBeCloned) {
+  // Basis.
+  if (!(objectToBeCloned instanceof Object)) {
+    return objectToBeCloned;
+  }
+
+  var objectClone;
+
+  // Filter out special objects.
+  var Constructor = objectToBeCloned.constructor;
+  switch (Constructor) {
+    // Implement other special objects here.
+    case RegExp:
+      objectClone = new Constructor(objectToBeCloned);
+      break;
+    case Date:
+      objectClone = new Constructor(objectToBeCloned.getTime());
+      break;
+    default:
+      objectClone = new Constructor();
+  }
+
+  // Clone each property.
+  for (var prop in objectToBeCloned) {
+    objectClone[prop] = clone(objectToBeCloned[prop]);
+  }
+
+  return objectClone;
+}
+
 var queries = {};
 
 var values = {};
@@ -91,7 +121,7 @@ var values = {};
       if(typeof value === 'undefined') {
         value={};
       }
-      values[this.key] = JSON.parse(JSON.stringify(value));
+      values[this.key] = clone(value);
       if (this.key in queries) {
         var index, len;
         for(index = 0, len = queries[this.key].length; index < len; ++index) {
@@ -169,7 +199,7 @@ var values = {};
         queries[key] = [];
       }
       queries[key].push(this); //add this element to the query list
-      this._setValue((key in values)?JSON.parse(JSON.stringify(values[key])):{});
+      this._setValue((key in values)?clone(values[key]):{});
     },
     _unregisterElement:function(key) {
       if (key in queries) {
