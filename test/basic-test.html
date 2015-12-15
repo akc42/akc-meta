@@ -50,17 +50,17 @@
 
       describe('<akc-meta>', function() {
         var template,app;
-         beforeEach(function(){
+        beforeEach(function(){
           template = fixture('basic-test');
           app = document.getElementById('app');
-         });
-         it ('akc-meta creates a valid element', function(){
+        });
+        it ('akc-meta creates a valid element', function(){
           expect(document.getElementById('meta1')).to.be.ok;
-         });
-         it('akc-meta-query creates a valid element',function(){
+        });
+        it('akc-meta-query creates a valid element',function(){
           expect(document.getElementById('meta2')).to.be.ok;
-         });
-         describe('akc-meta and akc-meta-query pairs', function(){
+        });
+        describe('akc-meta and akc-meta-query pairs', function(){
           var publisher, subscriber;
           beforeEach(function(){
               app.key1 = 'keya';
@@ -102,7 +102,7 @@
             app.value3 = "read only value";
             expect(app.value2).to.equal('write only test');
           });
-;       });
+        });
         describe('handles key changes',function(){
           beforeEach(function(){
             app.key1 = 'keya';
@@ -122,11 +122,14 @@
             app.key1 = 'keyb';
             expect(app.value3).to.equal('stringa');
           });
-          it('akc-meta changes to existing key, it overwrites the value',function(){
+          it('akc-meta changes to existing key, it doesnt overwrite the value',function(){
             app.key3 = 'keyc';
             expect(app.value3).to.equal('stringc');
+            assert.equal(app.value1,'stringa');
             app.key1 = 'keyc';
-            expect(app.value3).to.equal('stringa');
+            expect(app.value3).to.equal('stringc');
+            expect(app.value1).to.equal('stringc');
+
           });
           it('akc-meta-query changes to existing key, then it gets the new value',function(){
             assert.equal(app.value2,'stringa');
@@ -153,8 +156,28 @@
           });
 
         });
+        describe('akc-meta objects can two way communicate with each other if they have the same key',function(){
+          beforeEach(function(){
+            app.key1 = 'keya';
+            app.key4 = 'keya';
+            app.value1 = {hash1:'valuea',hash2:'valueb'};
+          });
+          it('on startup should reflect its value to other akc-meta with same key',function(){
+            expect(app.value4).to.deep.equal({hash1:'valuea',hash2:'valueb'});
+          });
+          it('change value on a meta, and all, including attached queries should change',function(){
+            app.key2 = 'keya';
+            app.key3 = 'keyb';
+            assert.deepEqual(app.value2,{hash1:'valuea',hash2:'valueb'});
+            app.value4 = 'back to a string';
+            expect(app.value1).to.equal('back to a string');
+            expect(app.value2).to.equal('back to a string');
+            expect(app.value3).not.to.equal('back to a string');
+          });
+        });
 
       });
+
     </script>
 
   </body>

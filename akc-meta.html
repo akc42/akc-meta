@@ -77,6 +77,8 @@ function clone(objectToBeCloned) {
 
 var queries = {};
 
+var metas = {}
+
 var values = {};
 
   Polymer({
@@ -107,32 +109,49 @@ var values = {};
       value: {
         type: Object,
         observer:'_valueChanged',
-        value:{}
+        value:{},
+        notify:true
       }
 
+    },
+    created:function(){
+      this.isAttached = false;
     },
     attached:function() {
-      this._valueChanged(this.value);
+      this.isAttached = true;
+      this._registerElement(this.key);
     },
     detached:function() {
-      this._unregister(this.key);
+      this._unregisterElement(this.key);
+      this.isAttached = false;
     },
     _valueChanged: function(value) {
-      if(typeof value === 'undefined') {
-        value={};
-      }
-      values[this.key] = clone(value);
-      if (this.key in queries) {
-        var index, len;
-        for(index = 0, len = queries[this.key].length; index < len; ++index) {
-          queries[this.key][index]._setValue(values[this.key]);  //set the value of every item referenced
+      var index, len;
+      if(this.isAttached) {
+        if(typeof value === 'undefined') {
+          value={};
+        }
+        values[this.key] = clone(value);
+        if(metas[this.key].length > 1) { //check if other metas with same key
+          for(index = 0, len=metas[this.key].length; index < len;++index) {
+            if(metas[this.key][index] !== this) {
+              metas[this.key][index].value = this.value;
+            }
+          }
+        }
+        if (this.key in queries) {
+          for(index = 0, len = queries[this.key].length; index < len; ++index) {
+            queries[this.key][index]._setValue(values[this.key]);  //set the value of every item referenced
 
+          }
         }
       }
     },
     _keyChanged:function(newKey,oldKey) {
-      this._unregister(oldKey);
-      this._valueChanged(this.value);  //This just informs all the others
+      if(this.isAttached) {
+        this._unregisterElement(oldKey);
+        this._registerElement(newKey);
+      }
     },
     _unregister:function(key) {
       var foundElement = false;
@@ -149,6 +168,28 @@ var values = {};
         delete values[key];
       }
 
+    },
+    _registerElement:function(key) {
+       if(!(key in metas)){
+        metas[key] = [];
+        metas[key].push(this);
+        this._valueChanged(this.value); //i'm the first meta with this key, so I set the value
+      } else {
+        metas[key].push(this); //add this element to the metas list
+        this.value = values[this.key];  //get the common value for this key
+      }
+    },
+    _unregisterElement:function(key) {
+      if (key in metas) {
+        if(metas[key].indexOf(this) > -1) {
+          metas[key].splice(metas[key].indexOf(this),1);  //remove self from meta list
+          if(metas[key].length == 0) {
+            //I was the last one with this key
+            delete metas[key];
+            this._unregister(key);
+          }
+        }
+      }
     }
   });
   Polymer({
