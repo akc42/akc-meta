@@ -51,6 +51,10 @@ function clone(objectToBeCloned) {
     return objectToBeCloned;
   }
 
+  if(typeof objectToBeCloned.then === 'function') {
+    return Promise.resolve(objectToBeCloned);
+  }
+
   var objectClone;
 
   // Filter out special objects.

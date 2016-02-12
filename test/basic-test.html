@@ -175,9 +175,39 @@
             expect(app.value3).not.to.equal('back to a string');
           });
         });
+        describe('objects can be Promises', function() {
+          beforeEach(function() {
+            app.key1='promise';
+            app.key2='promise';
+            app.value1 = false;
+          });
+          it('can pass across a promise', function(done) {
+            app.value1 = Promise.resolve('promiseValue');
+            expect(typeof app.value2.then).to.equal('function');
+            app.value2.then(function(value) {
+              expect(value).to.equal('promiseValue');
+              done();
+            });
+          });
+          it('passed promises resolve when source does', function(done) {
+            var createTime;
+            app.value1 = new Promise(function(accept,reject) {
+              createTime = new Date().getTime();
+              setTimeout(function() {
+                accept(new Date().getTime());
+              },10);
 
+            });
+            app.value2.then(function(value) {
+              var now = new Date().getTime();
+              expect(now).to.be.at.least(createTime+10);
+              expect(value).to.be.above(createTime);
+              expect(value).to.be.most(now);
+              done();
+            });
+          });
+        });
       });
-
     </script>
 
   </body>
